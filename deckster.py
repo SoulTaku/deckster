@@ -13,6 +13,22 @@ def get_price(card):
     for price in prices:
         return price.text
 
+def get_multi(card):
+    multi = 1
+    if card[0].isdigit():
+        multi = ''
+        for nr in card:
+            if nr != 'x':
+                multi += nr
+            else:
+                break
+            
+        card = card[len(multi)+1:]
+        multi = int(multi)
+        
+    return card, multi
+
+
 def main():
     parser = argparse.ArgumentParser(description =
                                      'Calculate the value your MTG deck')
@@ -32,23 +48,16 @@ def main():
         f = open(args.file, 'r')
         
         for card in f:
-            multi = 1
             card = card.strip('\n')
 
-            if card[0].isdigit():
-                multi = ''
-                for nr in card:
-                    if nr != 'x':
-                        multi += nr
-
-                card = card[len(multi)+2:]
+            card, multi = get_multi(card)
             
             price = get_price(card)
             
             if price:
                 price = float(price[2:])
-                total += price
-                print('[+] {:<30}{:^}$'.format(card, price))
+                total += price * multi
+                print('[+] {:<30}{:^.2f}${:>30.2f}$'.format(card, price, price*multi))
             else:
                 print('[!] Got problem at card {}'.format(card))
                 not_found.append(card)
@@ -69,12 +78,14 @@ def main():
         for word in args.card:
             card += word
             card += ' '
+
+        card, multi = get_multi(card)
             
         price = get_price(card)
         price = float(price[2:])
         
         if price:
-            print('[+] {:<30}{:^}$'.format(card, price))
+            print('[+] {:<30}{:^.2f}${:>30.2f}$'.format(card, price, price*multi))
         else:
             print('Card not found!')
 
