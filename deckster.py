@@ -32,7 +32,17 @@ def main():
         f = open(args.file, 'r')
         
         for card in f:
+            multi = 1
             card = card.strip('\n')
+
+            if card[0].isdigit():
+                multi = ''
+                for nr in card:
+                    if nr != 'x':
+                        multi += nr
+
+                card = card[len(multi)+2:]
+            
             price = get_price(card)
             
             if price:
